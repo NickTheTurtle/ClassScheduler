@@ -1,0 +1,8 @@
+#selectClassItems {
+  max-height: 400px;
+  overflow-y: scroll;
+}
+
+#selectClassItems > a {
+  max-width: 300px;
+}

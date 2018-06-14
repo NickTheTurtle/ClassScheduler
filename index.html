@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Class Scheduler</title>
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="js/jquery.js"></script>
+  <script defer src="bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script defer src="js/xlsx.min.js"></script>
+  <script defer src="js/schedule.min.js"></script>
+  <script defer src="js/script.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="display-4">Class Scheduler</h1>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <form>
+          <div class="form-group">
+            <label for="excelFile">
+              <strong>Upload Excel document (<a href="template.xlsx">Download Excel template</a>)</strong>
+            </label>
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="excelFile" />
+              <label class="custom-file-label" for="excelFile">Choose File</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="blockCount">
+              <strong>Block Count</strong>
+            </label>
+            <input type="number" class="form-control" id="blockCount" value="25" />
+          </div>
+          <div class="form-group">
+            <label for="blockCount">
+              <strong>Teacher Weight</strong>
+            </label>
+            <input type="number" class="form-control" id="teacherWeight" value="10" />
+          </div>
+          <div class="form-group">
+            <label for="iterations">
+              <strong>Max Iterations</strong>
+            </label>
+            <input type="number" class="form-control" id="iterations" value="7" />
+          </div>
+          <div class="form-group">
+            <label for="speed">
+              <strong>Speed</strong>
+            </label>
+            <input type="range" class="custom-range" id="speed" step="0.01" value="25" />
+          </div>
+          <button type="button" class="btn btn-primary disabled" id="runNode">Run with Node!</button>
+          <button type="button" class="btn btn-secondary disabled" id="runBrowser">Run in Browser!</button>
+        </form>
+      </div>
+    </div>
+    <div id="classes">
+      <div class="row justify-content-center mb-3">
+        <div class="col-md-3">
+          <div class="dropdown">
+            <button type="button" class="btn btn-primary btn-block dropdown-toggle" id="selectClass" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Class</button>
+            <div class="dropdown-menu" id="selectClassItems" aria-labelledby="selectClass"></div>
+          </div>
+        </div>
+      </div>
+      <table class="table mx-auto mb-3" id="displayClassInfo">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Class Count</th>
+            <th scope="col">Teacher</th>
+            <th scope="col">Grade Level</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <table class="table mx-auto" id="displayStudents">
+        <thead>
+          <tr>
+            <th scope="col">Student ID</th>
+            <th scope="col">Student Name</th>
+            <th scope="col">Student Grade Level</th>
+            <th scope="col">Student Email</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="modal fade" id="runNodeModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Run with Node!</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            <ol>
+              <li>Install the latest version of <a href="https://nodejs.org/">Node</a>, if you have not done so yet.</li>
+              <li>Open the command line, type <code>node</code>, and hit <kbd>Enter</kbd>.</li>
+              <li>
+                Copy-and-paste the following code, and hit <kbd>Enter</kbd> again:
+                <pre class="pre-scrollable"><code>function schedule(c,d,e,f,g){function h(q){for(let r=0,s=c.length;r&lt;s;++r)if(c[r].id===q)return c[r]}function l(q){let r=conflictTeachers=0,[s,t]=[[],[]];for(let w of q){let x=h(w);s.push(...x.students),t.push(x.teacher)}let u={},v={};for(let w=0,x=s.length;w&lt;x;++w)u[s[w]]?++r:u[s[w]]=1;for(let w=0,x=t.length;w&lt;x;++w)v[t[w]]?++conflictTeachers:v[t[w]]=1;return{students:r,teachers:conflictTeachers}}function n(q,r,s,t){if(!q.length)return s;let u=[];if(!s)for(;u.push([])&lt;d;);else u=s.map(x=&gt;[...x]);let v=[];for(let z,x=0,y=u.length;x&lt;y;++x)z=l(u[x].concat(q[0])),v[x]={scheduleNum:x,conflict:z.students+z.teachers*e};v=v.sort((x,y)=&gt;x.conflict-y.conflict||Math.random()-0.5);for(let z,x=0,y=f*v.length;x&lt;y;++x){if(z=!0,0===v[x].conflict){u[v[x].scheduleNum].push(q[0]);break}if(0&lt;r){let A=[...u[v[x].scheduleNum]],B=u.map(C=&gt;[...C]);if(B[v[x].scheduleNum]=[q[0]],B=n(A,r-1,B,!0),B){let C=newTimetableConflicts=0;for(let F,D=0,E=u.length;D&lt;E;++D)F=l(u[D]),C+=F.students+F.teachers*e;for(let F,D=0,E=B.length;D&lt;E;++D)F=l(B[D]),newTimetableConflicts+=F.students+F.teachers*e;if(newTimetableConflicts&lt;=C){u=B;break}else if(t)z=!1;else{u[v[0].scheduleNum].push(q[0]);break}}else if(t)z=!1;else{u[v[0].scheduleNum].push(q[0]);break}}else if(t)z=!1;else{u[v[0].scheduleNum].push(q[0]);break}}return n(q.slice(1),r,u)}let o=[];for(let q of c)for(let r=0,s=q.classCount;r&lt;s;++r)o.push(q.id);let p=o.sort((q,r)=&gt;h(r).students.length-h(q).students.length);return n(p,g)}<span id="runNodeCode"></span>
+ </code></pre>
+              </li>
+              <li>
+                <div>It may take a couple of hours before the code finishes, and it is recommended that you run multiple programs at the same time. Then, copy-and-paste the output below the "=" signs here:</div>
+                <div class="form-group">
+                  <textarea class="form-control" id="runNodeOutput" rows="5"></textarea>
+                  <div class="invalid-feedback" id="runNodeOutputInvalid">
+                    Are you sure you copied the right output?
+                  </div>
+                </div>
+              </li>
+            </ol>
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" id="runNodeDone">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
